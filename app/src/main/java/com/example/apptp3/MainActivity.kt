@@ -7,10 +7,14 @@ import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.activity_main.*
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.os.AsyncTask
+import kotlinx.android.synthetic.main.style_dune_ligne.*
+import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.startActivityForResult
-
-
-
+import org.jetbrains.anko.toast
+import java.net.URL
 
 
 class MainActivity : AppCompatActivity() {
@@ -21,13 +25,17 @@ class MainActivity : AppCompatActivity() {
         const val EXTRA_ISCONFIRMED = "ConfirmationActivity.ISCONFIRMED"
     }
 
+    var IMAGE:Bitmap?=null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(com.example.apptp3.R.layout.activity_main)
+        RecuperationImage()
+            .execute("https://source.unsplash.com/random/800x600").get()
 
         buildRecyclerView()
-        //le bouton pour permettre la saisie d'un contact
+
         btn_ajouter.setOnClickListener {
             startActivityForResult<AjoutPersonne>(1)
 
@@ -49,7 +57,11 @@ class MainActivity : AppCompatActivity() {
                         val nouvValeurtel = data?.getStringExtra(AjoutPersonne.EXTRA_TEL) ?: ""
                         val nouvValeurfixe = data?.getStringExtra(AjoutPersonne.EXTRA_FAXE) ?: ""
 
-                        var p8=Personne(nouvValeurnom,nouvValeuremail,nouvValeurtel,nouvValeurfixe)
+
+                            val photo=recupImage()
+
+
+                        var p8=Personne(photo,nouvValeurnom,nouvValeuremail,nouvValeurtel,nouvValeurfixe)
 
 
 
@@ -99,6 +111,38 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+fun recupImage():Bitmap?{
+    RecuperationImage()
+        .execute("https://source.unsplash.com/random/800x600").get()
+    val img=IMAGE
+    return img
+
+}
+
+
+    inner class RecuperationImage() : AsyncTask<String, Void, Bitmap?>() {
+        override fun doInBackground(vararg urls: String): Bitmap? {
+            val urlOfImage = urls[0]
+            return try {
+                val inputStream = URL(urlOfImage).openStream()
+                BitmapFactory.decodeStream(inputStream)
+            } catch (e: Exception) { // Catch the download exception
+                e.printStackTrace()
+                null
+            }
+        }
+        override fun onPostExecute(result: Bitmap?) {
+            if(result!=null){
+                // Display the downloaded image into image view
+                toast("telechargement avec succé")
+
+                IMAGE=result
+
+            }else{
+                toast("Erreur lors du telechargement")
+            }
+        }
+    }
 
 
 }

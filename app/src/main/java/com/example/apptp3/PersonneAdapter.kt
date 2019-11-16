@@ -1,15 +1,17 @@
 package com.example.apptp3
 
+import android.graphics.Bitmap
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.android.synthetic.main.style_dune_ligne.*
 import kotlinx.android.synthetic.main.style_dune_ligne.view.*
 import java.util.ArrayList
 
 
-data class Personne(val nom:String,val email:String,val tel:String,val fixe:String)
+data class Personne(val img:Bitmap?,val nom:String,val email:String,val tel:String,val fixe:String)
 
 class PersonneAdapter(val personneAAfficher: Array<Personne>, val listener: (Personne)-> Unit):
     RecyclerView.Adapter<PersonneAdapter.ViewHolder>() {
@@ -46,6 +48,7 @@ class PersonneAdapter(val personneAAfficher: Array<Personne>, val listener: (Per
            //remplissage de la partie nom
            itemView.tv_name.text=personne.nom
            itemView.tv_tel.text= personne.tel
+           itemView.image.setImageBitmap(personne.img)
 
            //l'action a realiser lors du clic  sur un element
            setOnClickListener{(listener(personne))}
